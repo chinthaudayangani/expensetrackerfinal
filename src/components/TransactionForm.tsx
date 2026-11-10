@@ -178,7 +178,7 @@ export function TransactionForm({ type }: { type: TransactionType }) {
             onBlur={() => blur("amount")}
             aria-invalid={!!errors.amount}
             aria-describedby={errors.amount ? "amount-error" : "amount-hint"}
-            className="h-16 border-0 bg-transparent px-0 font-display text-3xl font-semibold shadow-none tabular focus-visible:ring-0"
+            className="h-16 border-0 bg-transparent px-0 font-display text-3xl md:text-3xl font-semibold shadow-none tabular focus-visible:ring-0"
           />
         </div>
         {errors.amount ? (
