@@ -19,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
 type Field = "amount" | "date" | "category";
-type Errors = Partial<Record<Field, string>>;
+type Errors = Partial<Record<Field, string | undefined>>;
 
 const NOTE_MAX = 200;
 const QUICK_AMOUNTS = [10, 20, 50, 100];
@@ -42,7 +42,7 @@ export function cleanAmountInput(value: string) {
 const today = () => format(new Date(), "yyyy-MM-dd");
 const yesterday = () => format(subDays(new Date(), 1), "yyyy-MM-dd");
 
-function FieldError({ id, children }: { id: string; children?: string }) {
+function FieldError({ id, children }: { id: string; children?: string | undefined }) {
   if (!children) return null;
   return (
     <p id={id} role="alert" className="flex items-center gap-1.5 text-sm font-medium text-destructive">
