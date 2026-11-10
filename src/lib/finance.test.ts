@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   EMPTY_STATE,
   addTransaction,
+  budgetLevel,
   budgetSummary,
   calculateTotals,
+  summaryStats,
   parseAmount,
   removeTransaction,
   sanitizeState,
@@ -79,6 +81,22 @@ describe("monthly budget", () => {
     expect(s.remaining).toBe(375);
     expect(s.used).toBe(125);
     expect(s.percentUsed).toBe(25);
+  });
+
+  it("turns the budget bar to warning from 80% used", () => {
+    expect(budgetLevel(budgetSummary(800, 639))).toBe("ok");
+    expect(budgetLevel(budgetSummary(800, 640))).toBe("warn");
+    expect(budgetLevel(budgetSummary(800, 801))).toBe("over");
+    expect(budgetLevel(budgetSummary(0, 50))).toBe("none");
+  });
+
+  it("shows what share of income has been spent", () => {
+    const stats = summaryStats([
+      tx({ type: "income", amount: 2000 }),
+      tx({ type: "expense", amount: 500 }),
+    ]);
+    expect(stats.spentPercentOfIncome).toBe(25);
+    expect(summaryStats([tx({ amount: 5 })]).spentPercentOfIncome).toBeNull();
   });
 
   it("flags overspending when expenses exceed the budget", () => {

@@ -90,6 +90,26 @@ export function budgetSummary(monthlyBudget: number, totalExpenses: number) {
   };
 }
 
+export type BudgetLevel = "none" | "ok" | "warn" | "over";
+
+/** Colour level for the budget bar: warn from 80% used, over when spending passes the limit. */
+export function budgetLevel(s: ReturnType<typeof budgetSummary>): BudgetLevel {
+  if (!s.hasBudget) return "none";
+  if (s.isOver) return "over";
+  return s.percentUsed >= 80 ? "warn" : "ok";
+}
+
+/** Extra figures shown under the dashboard summary cards. */
+export function summaryStats(transactions: Transaction[]) {
+  const { totalIncome, totalExpenses } = calculateTotals(transactions);
+  return {
+    incomeCount: transactions.filter((t) => t.type === "income").length,
+    expenseCount: transactions.filter((t) => t.type === "expense").length,
+    /** Share of income already spent, or null when there is no income yet. */
+    spentPercentOfIncome: totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : null,
+  };
+}
+
 export function expensesByCategory(transactions: Transaction[]) {
   const map = new Map<string, number>();
   for (const t of transactions) {
