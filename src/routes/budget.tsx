@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { formatEuro, parseAmount } from "@/lib/finance";
+import { formatEuro, validateAmount } from "@/lib/finance";
 import { saveMonthlyBudget, useFinance } from "@/lib/finance-store";
 import { PageHeader, Panel } from "@/components/PageHeader";
 import { BudgetSummary } from "@/components/BudgetSummary";
@@ -37,11 +37,12 @@ function BudgetPage() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const parsed = parseAmount(value);
-    if (parsed === null) {
-      setError("Enter a budget above €0, for example 800.");
+    const check = validateAmount(value);
+    if (!check.ok) {
+      setError(check.error);
       return;
     }
+    const parsed = check.value;
     setError("");
     saveMonthlyBudget(parsed);
     setValue("");
