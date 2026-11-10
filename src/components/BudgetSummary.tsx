@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { AlertTriangle, PiggyBank } from "lucide-react";
-import { budgetSummary, calculateTotals, formatEuro } from "@/lib/finance";
+import { budgetLevel, budgetSummary, calculateTotals, formatEuro } from "@/lib/finance";
+import { BudgetProgressBar, levelBadgeClass } from "@/components/BudgetProgressBar";
 import { useFinance } from "@/lib/finance-store";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -32,7 +33,7 @@ export function BudgetSummary({ showLink = true }: { showLink?: boolean }) {
   }
 
   const pct = Math.round(s.percentUsed);
-  const level = s.isOver ? "over" : s.percentUsed >= 80 ? "warn" : "ok";
+  const level = budgetLevel(s);
 
   return (
     <div className="p-5 sm:p-6">
@@ -42,35 +43,13 @@ export function BudgetSummary({ showLink = true }: { showLink?: boolean }) {
           <p className="text-sm text-muted-foreground tabular">{formatEuro(s.budget)} limit</p>
         </div>
         <span
-          className={cn(
-            "rounded-full px-2.5 py-1 text-xs font-semibold tabular",
-            level === "ok" && "bg-income-soft text-income",
-            level === "warn" && "bg-warning-soft text-warning",
-            level === "over" && "bg-expense-soft text-expense",
-          )}
+          className={cn("rounded-full px-2.5 py-1 text-xs font-semibold tabular", levelBadgeClass[level])}
         >
           {pct}% used
         </span>
       </div>
 
-      <div
-        className="mt-5 h-3 w-full overflow-hidden rounded-full bg-muted"
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.min(pct, 100)}
-        aria-label="Budget used"
-      >
-        <div
-          className={cn(
-            "h-full rounded-full transition-all duration-500",
-            level === "ok" && "bg-hero-gradient",
-            level === "warn" && "bg-warning",
-            level === "over" && "bg-expense",
-          )}
-          style={{ width: `${Math.min(s.percentUsed, 100)}%` }}
-        />
-      </div>
+      <BudgetProgressBar percent={s.percentUsed} level={level} className="mt-5 h-3" />
 
       <dl className="mt-5 grid grid-cols-2 gap-3">
         <div className="rounded-xl bg-muted/70 p-3">

@@ -80,7 +80,7 @@ export function SummaryCards() {
       <SummaryCard
         label="Total income"
         icon={<ArrowDownLeft className="h-4 w-4" />}
-        footer={plural(stats.incomeCount, "income entry").replace("entrys", "entries")}
+        footer={stats.incomeCount === 1 ? "1 income entry" : `${stats.incomeCount} income entries`}
       >
         <p className={cn(valueClass, "text-foreground")}>{formatEuro(totalIncome)}</p>
       </SummaryCard>

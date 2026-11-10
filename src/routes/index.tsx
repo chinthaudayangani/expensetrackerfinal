@@ -61,27 +61,7 @@ function Dashboard() {
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="relative overflow-hidden rounded-2xl bg-hero-gradient p-5 text-primary-foreground shadow-hero sm:col-span-2 lg:col-span-1 sm:p-6">
-          <Wallet className="absolute -right-4 -bottom-4 h-28 w-28 opacity-15" />
-          <p className="text-sm font-medium opacity-90">Remaining balance</p>
-          <p className="mt-2 font-display text-4xl font-semibold tabular">{formatEuro(balance)}</p>
-          <p className="mt-2 text-xs opacity-80">Total income − total expenses</p>
-        </div>
-
-        <StatCard
-          label="Total income"
-          value={totalIncome}
-          icon={<ArrowDownLeft className="h-5 w-5" />}
-          tone="income"
-        />
-        <StatCard
-          label="Total expenses"
-          value={totalExpenses}
-          icon={<ArrowUpRight className="h-5 w-5" />}
-          tone="expense"
-        />
-      </div>
+      <SummaryCards />
 
       <div className="mt-4 grid gap-4 lg:grid-cols-5">
         <Panel className="lg:col-span-3">
