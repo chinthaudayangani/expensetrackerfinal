@@ -130,6 +130,17 @@ export function summaryStats(transactions: Transaction[]) {
   };
 }
 
+/** How many rows of each type are stored — drives the History filter tabs. */
+export function countByType(transactions: Transaction[]) {
+  let income = 0;
+  let expense = 0;
+  for (const t of transactions) {
+    if (t.type === "income") income++;
+    else expense++;
+  }
+  return { all: transactions.length, income, expense };
+}
+
 export function expensesByCategory(transactions: Transaction[]) {
   const map = new Map<string, number>();
   for (const t of transactions) {

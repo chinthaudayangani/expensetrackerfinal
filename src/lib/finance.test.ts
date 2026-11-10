@@ -5,6 +5,7 @@ import {
   budgetLevel,
   budgetSummary,
   calculateTotals,
+  countByType,
   summaryStats,
   validateAmount,
   parseAmount,
@@ -89,6 +90,38 @@ describe("totals", () => {
     state = removeTransaction(state, "b");
     expect(calculateTotals(state.transactions).totalExpenses).toBe(0);
     expect(calculateTotals(state.transactions).balance).toBe(100);
+  });
+
+  it("deleting an income lowers total income and the balance", () => {
+    let state = addTransaction(EMPTY_STATE, tx({ id: "a", type: "income", amount: 1200 }));
+    state = addTransaction(state, tx({ id: "b", type: "income", amount: 300 }));
+    state = addTransaction(state, tx({ id: "c", amount: 50 }));
+    state = removeTransaction(state, "b");
+    const totals = calculateTotals(state.transactions);
+    expect(totals.totalIncome).toBe(1200);
+    expect(totals.totalExpenses).toBe(50);
+    expect(totals.balance).toBe(1150);
+  });
+
+  it("deleting the last transaction leaves every total at zero", () => {
+    let state = addTransaction(EMPTY_STATE, tx({ id: "only", amount: 12.34 }));
+    state = removeTransaction(state, "only");
+    expect(state.transactions).toHaveLength(0);
+    expect(calculateTotals(state.transactions)).toEqual({
+      totalIncome: 0,
+      totalExpenses: 0,
+      balance: 0,
+    });
+  });
+
+  it("counts rows per type for the history filter tabs", () => {
+    const counts = countByType([
+      tx({ type: "income" }),
+      tx({ type: "income" }),
+      tx({ type: "expense" }),
+    ]);
+    expect(counts).toEqual({ all: 3, income: 2, expense: 1 });
+    expect(countByType([])).toEqual({ all: 0, income: 0, expense: 0 });
   });
 });
 
