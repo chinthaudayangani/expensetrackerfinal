@@ -79,7 +79,7 @@ function BudgetPage() {
                   value={value}
                   onChange={(e) => setValue(cleanAmountInput(e.target.value))}
                   aria-invalid={!!error}
-                  className="h-12 pl-8 font-display text-lg font-semibold tabular"
+                  className="h-12 pl-8 font-display text-lg md:text-lg font-semibold tabular"
                 />
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
