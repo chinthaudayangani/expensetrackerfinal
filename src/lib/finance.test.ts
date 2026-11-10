@@ -2,8 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   EMPTY_STATE,
   addTransaction,
+  budgetLevel,
   budgetSummary,
   calculateTotals,
+  summaryStats,
+  validateAmount,
   parseAmount,
   removeTransaction,
   sanitizeState,
@@ -34,6 +37,22 @@ describe("amount rules", () => {
   it("accepts euro amounts with a comma or dot", () => {
     expect(parseAmount("12,50")).toBe(12.5);
     expect(parseAmount("12.5")).toBe(12.5);
+  });
+
+  it("form says the amount cannot be empty", () => {
+    expect(validateAmount("  ")).toEqual({ ok: false, error: "Please enter an amount." });
+  });
+
+  it("form says the amount cannot be negative", () => {
+    expect(validateAmount("-12")).toEqual({ ok: false, error: "Amount can't be negative." });
+  });
+
+  it("form rejects a zero amount", () => {
+    expect(validateAmount("0,00").ok).toBe(false);
+  });
+
+  it("form accepts a valid euro amount", () => {
+    expect(validateAmount("19,99")).toEqual({ ok: true, value: 19.99 });
   });
 
   it("refuses to store a transaction with a negative amount", () => {
@@ -79,6 +98,22 @@ describe("monthly budget", () => {
     expect(s.remaining).toBe(375);
     expect(s.used).toBe(125);
     expect(s.percentUsed).toBe(25);
+  });
+
+  it("turns the budget bar to warning from 80% used", () => {
+    expect(budgetLevel(budgetSummary(800, 639))).toBe("ok");
+    expect(budgetLevel(budgetSummary(800, 640))).toBe("warn");
+    expect(budgetLevel(budgetSummary(800, 801))).toBe("over");
+    expect(budgetLevel(budgetSummary(0, 50))).toBe("none");
+  });
+
+  it("shows what share of income has been spent", () => {
+    const stats = summaryStats([
+      tx({ type: "income", amount: 2000 }),
+      tx({ type: "expense", amount: 500 }),
+    ]);
+    expect(stats.spentPercentOfIncome).toBe(25);
+    expect(summaryStats([tx({ amount: 5 })]).spentPercentOfIncome).toBeNull();
   });
 
   it("flags overspending when expenses exceed the budget", () => {

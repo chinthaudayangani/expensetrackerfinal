@@ -1,15 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowDownLeft, ArrowUpRight, MinusCircle, PlusCircle, Wallet } from "lucide-react";
-import {
-  calculateTotals,
-  expensesByCategory,
-  formatEuro,
-  sortNewestFirst,
-} from "@/lib/finance";
+import { MinusCircle, PlusCircle } from "lucide-react";
+import { expensesByCategory, formatEuro, sortNewestFirst } from "@/lib/finance";
 import { useFinance } from "@/lib/finance-store";
 import { categoryIcon } from "@/lib/category-icons";
 import { PageHeader, Panel } from "@/components/PageHeader";
 import { BudgetSummary } from "@/components/BudgetSummary";
+import { SummaryCards } from "@/components/SummaryCards";
 import { TransactionList } from "@/components/TransactionList";
 import { Button } from "@/components/ui/button";
 
@@ -35,7 +31,6 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const { transactions } = useFinance();
-  const { totalIncome, totalExpenses, balance } = calculateTotals(transactions);
   const recent = sortNewestFirst(transactions).slice(0, 5);
   const byCategory = expensesByCategory(transactions);
   const maxCat = byCategory[0]?.amount ?? 0;
@@ -61,27 +56,7 @@ function Dashboard() {
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="relative overflow-hidden rounded-2xl bg-hero-gradient p-5 text-primary-foreground shadow-hero sm:col-span-2 lg:col-span-1 sm:p-6">
-          <Wallet className="absolute -right-4 -bottom-4 h-28 w-28 opacity-15" />
-          <p className="text-sm font-medium opacity-90">Remaining balance</p>
-          <p className="mt-2 font-display text-4xl font-semibold tabular">{formatEuro(balance)}</p>
-          <p className="mt-2 text-xs opacity-80">Total income − total expenses</p>
-        </div>
-
-        <StatCard
-          label="Total income"
-          value={totalIncome}
-          icon={<ArrowDownLeft className="h-5 w-5" />}
-          tone="income"
-        />
-        <StatCard
-          label="Total expenses"
-          value={totalExpenses}
-          icon={<ArrowUpRight className="h-5 w-5" />}
-          tone="expense"
-        />
-      </div>
+      <SummaryCards />
 
       <div className="mt-4 grid gap-4 lg:grid-cols-5">
         <Panel className="lg:col-span-3">
@@ -141,39 +116,5 @@ function Dashboard() {
         )}
       </Panel>
     </>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  icon,
-  tone,
-}: {
-  label: string;
-  value: number;
-  icon: React.ReactNode;
-  tone: "income" | "expense";
-}) {
-  return (
-    <Panel>
-      <div className="flex items-start justify-between gap-3 p-5 sm:p-6">
-        <div>
-          <p className="text-sm font-medium text-muted-foreground">{label}</p>
-          <p className="mt-2 font-display text-3xl font-semibold tabular text-foreground">
-            {formatEuro(value)}
-          </p>
-        </div>
-        <span
-          className={
-            tone === "income"
-              ? "flex h-10 w-10 items-center justify-center rounded-xl bg-income-soft text-income"
-              : "flex h-10 w-10 items-center justify-center rounded-xl bg-expense-soft text-expense"
-          }
-        >
-          {icon}
-        </span>
-      </div>
-    </Panel>
   );
 }

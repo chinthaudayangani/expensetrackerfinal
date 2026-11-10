@@ -54,6 +54,26 @@ export function parseAmount(raw: string, { allowZero = false } = {}): number | n
   return fromCents(toCents(value));
 }
 
+export type AmountCheck = { ok: true; value: number } | { ok: false; error: string };
+
+/** Friendly validation for the amount box: explains exactly what is wrong. */
+export function validateAmount(raw: string): AmountCheck {
+  const trimmed = raw.trim();
+  if (trimmed === "") return { ok: false, error: "Please enter an amount." };
+  if (trimmed.includes("-")) return { ok: false, error: "Amount can't be negative." };
+  const cleaned = trimmed.replace(",", ".");
+  if (!/^\d*(\.\d*)?$/.test(cleaned) || cleaned === ".")
+    return { ok: false, error: "Use numbers only, for example 12.50." };
+  if (/\.\d{3,}$/.test(cleaned)) return { ok: false, error: "Use at most 2 decimals (cents)." };
+  const value = parseAmount(trimmed);
+  if (value === null) {
+    return Number(cleaned) === 0
+      ? { ok: false, error: "Amount must be more than €0." }
+      : { ok: false, error: "That amount is too large." };
+  }
+  return { ok: true, value };
+}
+
 export function isValidDate(value: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const d = new Date(`${value}T00:00:00`);
@@ -87,6 +107,26 @@ export function budgetSummary(monthlyBudget: number, totalExpenses: number) {
     percentUsed,
     hasBudget: monthlyBudget > 0,
     isOver: monthlyBudget > 0 && remaining < 0,
+  };
+}
+
+export type BudgetLevel = "none" | "ok" | "warn" | "over";
+
+/** Colour level for the budget bar: warn from 80% used, over when spending passes the limit. */
+export function budgetLevel(s: ReturnType<typeof budgetSummary>): BudgetLevel {
+  if (!s.hasBudget) return "none";
+  if (s.isOver) return "over";
+  return s.percentUsed >= 80 ? "warn" : "ok";
+}
+
+/** Extra figures shown under the dashboard summary cards. */
+export function summaryStats(transactions: Transaction[]) {
+  const { totalIncome, totalExpenses } = calculateTotals(transactions);
+  return {
+    incomeCount: transactions.filter((t) => t.type === "income").length,
+    expenseCount: transactions.filter((t) => t.type === "expense").length,
+    /** Share of income already spent, or null when there is no income yet. */
+    spentPercentOfIncome: totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : null,
   };
 }
 
