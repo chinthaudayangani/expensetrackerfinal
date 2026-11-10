@@ -6,6 +6,7 @@ import {
   budgetSummary,
   calculateTotals,
   summaryStats,
+  validateAmount,
   parseAmount,
   removeTransaction,
   sanitizeState,
@@ -36,6 +37,22 @@ describe("amount rules", () => {
   it("accepts euro amounts with a comma or dot", () => {
     expect(parseAmount("12,50")).toBe(12.5);
     expect(parseAmount("12.5")).toBe(12.5);
+  });
+
+  it("form says the amount cannot be empty", () => {
+    expect(validateAmount("  ")).toEqual({ ok: false, error: "Please enter an amount." });
+  });
+
+  it("form says the amount cannot be negative", () => {
+    expect(validateAmount("-12")).toEqual({ ok: false, error: "Amount can't be negative." });
+  });
+
+  it("form rejects a zero amount", () => {
+    expect(validateAmount("0,00").ok).toBe(false);
+  });
+
+  it("form accepts a valid euro amount", () => {
+    expect(validateAmount("19,99")).toEqual({ ok: true, value: 19.99 });
   });
 
   it("refuses to store a transaction with a negative amount", () => {

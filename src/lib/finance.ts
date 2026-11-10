@@ -54,6 +54,26 @@ export function parseAmount(raw: string, { allowZero = false } = {}): number | n
   return fromCents(toCents(value));
 }
 
+export type AmountCheck = { ok: true; value: number } | { ok: false; error: string };
+
+/** Friendly validation for the amount box: explains exactly what is wrong. */
+export function validateAmount(raw: string): AmountCheck {
+  const trimmed = raw.trim();
+  if (trimmed === "") return { ok: false, error: "Please enter an amount." };
+  if (trimmed.includes("-")) return { ok: false, error: "Amount can't be negative." };
+  const cleaned = trimmed.replace(",", ".");
+  if (!/^\d*(\.\d*)?$/.test(cleaned) || cleaned === ".")
+    return { ok: false, error: "Use numbers only, for example 12.50." };
+  if (/\.\d{3,}$/.test(cleaned)) return { ok: false, error: "Use at most 2 decimals (cents)." };
+  const value = parseAmount(trimmed);
+  if (value === null) {
+    return Number(cleaned) === 0
+      ? { ok: false, error: "Amount must be more than €0." }
+      : { ok: false, error: "That amount is too large." };
+  }
+  return { ok: true, value };
+}
+
 export function isValidDate(value: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const d = new Date(`${value}T00:00:00`);
