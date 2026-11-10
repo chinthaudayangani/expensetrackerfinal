@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- Money math and validation live in pure functions in `src/lib/finance.ts` (tested in `finance.test.ts`); UI never computes totals itself — keeps rules in one testable place.
+- App state (transactions + budget) is a localStorage-backed external store read via `useSyncExternalStore` in `src/lib/finance-store.ts`; server snapshot is empty so SSR never touches `window`.
