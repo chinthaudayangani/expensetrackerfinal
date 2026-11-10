@@ -34,16 +34,29 @@ export function TransactionList({
   allowDelete?: boolean;
 }) {
   return (
-    <ul className="divide-y divide-border">
+    <ul className="space-y-2 p-2 sm:p-3">
       {transactions.map((t) => {
         const Icon = categoryIcon(t.type, t.category);
         const isIncome = t.type === "income";
         return (
-          <li key={t.id} className="flex items-center gap-3 px-4 py-3.5 animate-rise sm:px-5">
+          <li
+            key={t.id}
+            className={cn(
+              "relative flex items-center gap-3 overflow-hidden rounded-xl border py-3 pl-5 pr-3 animate-rise sm:pr-4",
+              isIncome
+                ? "border-income/20 bg-income-soft/50"
+                : "border-expense/20 bg-expense-soft/50",
+            )}
+          >
+            <span
+              aria-hidden
+              className={cn("absolute inset-y-0 left-0 w-1.5", isIncome ? "bg-income" : "bg-expense")}
+            />
+
             <span
               className={cn(
-                "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-                isIncome ? "bg-income-soft text-income" : "bg-expense-soft text-expense",
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-card shadow-card",
+                isIncome ? "text-income" : "text-expense",
               )}
             >
               <Icon className="h-5 w-5" />
@@ -54,8 +67,8 @@ export function TransactionList({
                 <p className="font-medium text-foreground">{t.category}</p>
                 <span
                   className={cn(
-                    "rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
-                    isIncome ? "bg-income-soft text-income" : "bg-expense-soft text-expense",
+                    "rounded-full bg-card px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
+                    isIncome ? "text-income" : "text-expense",
                   )}
                 >
                   {isIncome ? "Income" : "Expense"}
@@ -65,10 +78,10 @@ export function TransactionList({
               {t.note && <p className="mt-0.5 truncate text-sm text-muted-foreground">{t.note}</p>}
             </div>
 
-            <div className="flex shrink-0 items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1.5">
               <span
                 className={cn(
-                  "font-display font-semibold tabular",
+                  "rounded-lg bg-card px-2.5 py-1 font-display text-sm font-semibold tabular shadow-card sm:text-base",
                   isIncome ? "text-income" : "text-expense",
                 )}
               >
@@ -79,9 +92,9 @@ export function TransactionList({
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="icon"
-                      className="text-muted-foreground hover:bg-expense-soft hover:text-expense"
+                      className="border-transparent bg-card text-muted-foreground shadow-card hover:border-expense/40 hover:bg-expense-soft hover:text-expense"
                       aria-label={`Delete ${t.category} ${formatEuro(t.amount)}`}
                     >
                       <Trash2 />
