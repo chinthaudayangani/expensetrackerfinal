@@ -137,11 +137,11 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen">
         <AppHeader />
-        <main className="mx-auto max-w-6xl px-4 py-6 sm:py-10">
+        <main className="mx-auto max-w-6xl px-4 pb-8 pt-5 sm:px-6 sm:pt-8 md:pb-12">
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
         </main>
-        <footer className="mx-auto max-w-6xl px-4 pb-8 text-xs text-muted-foreground">
+        <footer className="mx-auto max-w-6xl px-4 pb-28 text-center text-xs text-muted-foreground sm:px-6 md:pb-8 md:text-left">
           Your data is saved only in this browser.
         </footer>
       </div>
